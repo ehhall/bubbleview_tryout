@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <title>Our test experiment</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style>
+      body {
+        font-size: 16pt;
+        font-family: Helvetica, Arial;
+      }
+      #instructions {
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      button {
+        font-size: 16pt;
+        font-weight: bold;
+      }
+      .trial {
+        display: none;
+        font-size: 40pt;
+        text-align: center;
+      }
+      #done {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Instructions DIV is hidden once they 
+    click the button -->
+    <div id="instructions">
+      <p>
+        You will see a sequence of words and non-words. For each one, decide as
+        quickly as you can whether it is a word or non-word. If it is a word,
+        press 'w'. If it is not a word, press 'p'.
+      </p>
+      <button id="startExperimentButton">
+        Click here when you are ready to proceed.
+      </button>
+    </div>
+
+    <!-- This is the list of trials, each with class 
+      "trial" and with unique IDs, we will hide and show
+      these throughout the experiment -->
+    <div class="trial" id="trial_1">
+      cactus
+    </div>
+    <div class="trial" id="trial_2">
+      apple
+    </div>
+    <div class="trial" id="trial_3">
+      hyup
+    </div>
+    <div class="trial" id="trial_4">
+      fern
+    </div>
+    <div class="trial" id="trial_5">
+      foil
+    </div>
+
+    <div id="done">
+      Thanks for doing a great job!
+    </div>
+
+    <script>
+      var nTrials = 5;
+      var curTrial = 1;
+      
+      var curTrialStarted = 0;
+
+      /* This gets called when they click the button 
+        on the instructions page */
+      function StartExperiment() {
+        $("#instructions").hide();
+        ShowTrial();
+      }
+
+      function ShowTrial() {
+        setTimeout(Runs500msAfterTrial, 500);
+      }
+
+      function Runs500msAfterTrial() {
+        /* This runs 500ms after ShowTrial is called */
+        $("#trial_" + curTrial).show();
+        curTrialStarted = new Date();
+
+        /* Set up key listener */
+        $(document).on("keydown.wordOrNot", PressedKey);
+        console.log("after key listener");
+      }
+
+      function PressedKey(event) {
+        /*  console.log(event.which); */
+        console.log("stimulus", $("#trial_" + curTrial).text());
+        if (event.which == 87) {
+          /* w for word */
+          console.log("said word!");
+        }
+        if (event.which == 80) {
+          /* p for non-word */
+          console.log("said non-word");
+        }
+        if (event.which == 80 || event.which == 87) {w
+          /* Calculate reaction time */
+          var curTime = new Date();
+          console.log(curTime - curTrialStarted);
+
+          /* Hide current word and stop listening for keys */
+          $("#trial_" + curTrial).hide();
+          $(document).off("keydown.wordOrNot");
+
+          /* Are there more trials left? */
+          curTrial = curTrial + 1;
+          if (curTrial <= nTrials) {
+            setTimeout(ShowTrial, 500);
+          } else {
+            $("#done").show();
+          }
+        }
+      }
+
+      $("#startExperimentButton").on("click", StartExperiment);
+    </script>
+  </body>
+</html>
